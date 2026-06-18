@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prode Mundial 2026</title>
+    <style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+    --bg:#0a1628; --bg2:#0d1f35; --bg3:#1a2e4a; --border:#1e3a5f;
+    --gold:#c9a227; --gold2:#e0b82c; --text:#e8edf5; --muted:#8899aa;
+    --green:#2ea84e; --red:#e05555;
+}
+body { font-family:'Segoe UI',Tahoma,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+header { background:linear-gradient(135deg,var(--bg3),var(--bg2)); border-bottom:3px solid var(--gold); padding:22px 20px; text-align:center; }
+header h1 { font-size:1.75rem; color:var(--gold); letter-spacing:3px; text-transform:uppercase; }
+header p  { color:var(--muted); margin-top:6px; font-size:.85rem; }
+.tabs { display:flex; background:var(--bg2); border-bottom:1px solid var(--border); overflow-x:auto; position:sticky; top:0; z-index:20; }
+.tab-btn { padding:14px 22px; background:none; border:none; color:var(--muted); cursor:pointer; font-size:.9rem; font-weight:500; border-bottom:3px solid transparent; transition:all .15s; white-space:nowrap; }
+.tab-btn:hover  { color:var(--text); background:rgba(201,162,39,.08); }
+.tab-btn.active { color:var(--gold); border-bottom-color:var(--gold); }
+.content { max-width:1100px; margin:28px auto; padding:0 16px; }
+.tab-pane { display:none; } .tab-pane.active { display:block; }
+.card { background:var(--bg3); border-radius:10px; padding:20px; margin-bottom:20px; border:1px solid var(--border); }
+.card-title { font-size:.75rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--gold); margin-bottom:16px; font-weight:700; }
+.form-row { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; }
+.field { display:flex; flex-direction:column; gap:6px; flex:1; min-width:120px; }
+.field label { font-size:.78rem; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+input[type=text],input[type=date],select { background:var(--bg2); border:1px solid var(--border); color:var(--text); padding:9px 12px; border-radius:6px; font-size:.9rem; outline:none; transition:border-color .2s; width:100%; }
+input[type=text]:focus,input[type=date]:focus,select:focus { border-color:var(--gold); }
+input::placeholder { color:var(--muted); }
+.btn { padding:9px 18px; border:none; border-radius:6px; cursor:pointer; font-size:.875rem; font-weight:600; transition:all .15s; white-space:nowrap; }
+.btn-gold { background:var(--gold); color:var(--bg); } .btn-gold:hover { background:var(--gold2); }
+.btn-green { background:var(--green); color:#fff; } .btn-green:hover { background:#38c45e; }
+.btn-sm { padding:5px 12px; font-size:.8rem; }
+.btn-outline { background:transparent; color:var(--muted); border:1px solid var(--border); }
+.btn-outline:hover { border-color:var(--muted); color:var(--text); }
+.btn-outline-red { background:transparent; color:var(--red); border:1px solid var(--red); }
+.btn-outline-red:hover { background:var(--red); color:#fff; }
+.btn-outline-gold { background:transparent; color:var(--gold); border:1px solid var(--gold); }
+.btn-outline-gold:hover { background:rgba(201,162,39,.15); }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; }
+th { background:var(--bg2); color:var(--muted); padding:10px 14px; text-align:left; font-size:.75rem; text-transform:uppercase; letter-spacing:.7px; font-weight:600; }
+td { padding:11px 14px; border-bottom:1px solid var(--border); font-size:.9rem; vertical-align:middle; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:rgba(201,162,39,.04); }
+.badge { display:inline-block; padding:2px 9px; border-radius:4px; font-size:.75rem; font-weight:600; }
+.badge-phase   { background:var(--bg); color:var(--muted); border:1px solid var(--border); }
+.badge-pending { background:rgba(136,153,170,.15); color:var(--muted); }
+.badge-done    { background:rgba(46,168,78,.15); color:var(--green); }
+.badge-warn    { background:rgba(201,162,39,.15); color:var(--gold); }
+.rank-c { display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:50%; font-weight:700; font-size:.85rem; }
+.rank-1 { background:#c9a227; color:var(--bg); }
+.rank-2 { background:#8a8a8a; color:#fff; }
+.rank-3 { background:#c47c2e; color:#fff; }
+.rank-n { background:var(--border); color:var(--muted); }
+.pts { display:inline-block; background:rgba(46,168,78,.15); color:var(--green); padding:3px 12px; border-radius:20px; font-weight:700; font-size:.95rem; min-width:44px; text-align:center; }
+.stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:20px; }
+.stat-box { background:var(--bg2); border-radius:8px; padding:16px; text-align:center; border:1px solid var(--border); }
+.stat-value { font-size:2rem; font-weight:700; color:var(--gold); line-height:1; }
+.stat-label { font-size:.73rem; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-top:6px; }
+.prog-track { background:var(--bg); border-radius:3px; height:5px; overflow:hidden; margin-top:5px; }
+.prog-fill  { height:100%; background:var(--green); border-radius:3px; transition:width .3s; }
+.section-sep { font-size:.72rem; text-transform:uppercase; letter-spacing:2px; color:var(--muted); margin:18px 0 10px; padding-bottom:7px; border-bottom:1px solid var(--border); }
+tr.row-correct { background:rgba(46,168,78,.07); }
+tr.row-wrong   { background:rgba(224,85,85,.07); }
+select.pred-sel { padding:5px 8px; font-size:.82rem; min-width:110px; }
+.p-summary { background:var(--bg2); border-radius:8px; padding:14px 20px; margin-bottom:18px; display:flex; gap:28px; flex-wrap:wrap; }
+.p-summary-item span { display:block; font-size:.73rem; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+.p-summary-item strong { font-size:1.4rem; font-weight:700; }
+.empty { text-align:center; padding:38px 20px; color:var(--muted); }
+.empty-icon { font-size:2.5rem; margin-bottom:10px; }
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.72); z-index:100; align-items:center; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal-box { background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:28px; width:400px; max-width:94vw; }
+.modal-title { color:var(--gold); font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:18px; }
+.match-info { background:var(--bg2); border-radius:8px; padding:14px; text-align:center; margin-bottom:18px; }
+.match-teams { font-size:1.05rem; font-weight:700; }
+.match-meta  { font-size:.8rem; color:var(--muted); margin-top:4px; }
+.result-opts { display:flex; gap:8px; margin-bottom:18px; }
+.r-btn { flex:1; padding:12px 6px; border:2px solid var(--border); border-radius:8px; background:var(--bg2); color:var(--muted); cursor:pointer; text-align:center; transition:all .15s; font-size:.82rem; font-weight:600; }
+.r-btn:hover { border-color:var(--gold); color:var(--text); }
+.r-btn.selected { border-color:var(--gold); background:rgba(201,162,39,.12); color:var(--gold); }
+.r-btn-team { font-size:.9rem; margin-bottom:3px; }
+.r-btn-sub  { font-size:.72rem; color:var(--muted); }
+.modal-actions { display:flex; gap:10px; align-items:center; }
+.modal-actions .spacer { flex:1; }
+.edit-teams-form { display:flex; flex-direction:column; gap:12px; margin-bottom:20px; }
+@media(max-width:600px) { header h1{font-size:1.3rem;} .tab-btn{padding:12px 14px;font-size:.82rem;} }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>⚽ Prode Mundial 2026</h1>
+    <p>Cargá pronósticos · Ingresá resultados · Seguí la tabla</p>
+</header>
+
+<nav class="tabs" id="tabNav">
+    <button class="tab-btn active" data-tab="tabla">🏆 Tabla</button>
+    <button class="tab-btn" data-tab="participantes">👥 Participantes</button>
+    <button class="tab-btn" data-tab="partidos">⚽ Partidos</button>
+    <button class="tab-btn" data-tab="pronosticos">🎯 Pronósticos</button>
+    <button class="tab-btn" data-tab="stats">📊 Estadísticas</button>
+</nav>
+
+<main class="content">
+    <div id="tab-tabla" class="tab-pane active">
+        <div id="stats-summary"></div>
+        <div class="card"><div class="card-title">Tabla de posiciones</div><div id="leaderboard-body"></div></div>
+    </div>
+    <div id="tab-participantes" class="tab-pane">
+        <div class="card">
+            <div class="card-title">Agregar participante</div>
+            <div class="form-row">
+                <div class="field"><label>Nombre</label><input type="text" id="inp-p-name" placeholder="Nombre del participante" maxlength="50"></div>
+                <button class="btn btn-gold" onclick="handleAddParticipant()">Agregar</button>
+            </div>
+        </div>
+        <div class="card"><div class="card-title">Participantes registrados</div><div id="participants-body"></div></div>
+    </div>
+    <div id="tab-partidos" class="tab-pane">
+        <div class="card">
+            <div class="card-title">Agregar partido</div>
+            <div class="form-row">
+                <div class="field" style="min-width:150px"><label>Fase</label>
+                    <select id="inp-m-phase">
+                        <option value="Fase de Grupos">Fase de Grupos</option>
+                        <option value="Ronda de 32">Ronda de 32</option>
+                        <option value="Octavos de Final">Octavos de Final</option>
+                        <option value="Cuartos de Final">Cuartos de Final</option>
+                        <option value="Semifinal">Semifinal</option>
+                        <option value="Tercer Lugar">Tercer Lugar</option>
+                        <option value="Final">Final</option>
+                    </select>
+                </div>
+                <div class="field" style="min-width:140px"><label>Fecha</label><input type="date" id="inp-m-date"></div>
+                <div class="field"><label>Equipo 1</label><input type="text" id="inp-m-t1" placeholder="Ej: Argentina" maxlength="40"></div>
+                <div class="field"><label>Equipo 2</label><input type="text" id="inp-m-t2" placeholder="Ej: Brasil" maxlength="40"></div>
+                <button class="btn btn-gold" onclick="handleAddMatch()">Agregar</button>
+            </div>
+        </div>
+        <div class="card"><div class="card-title">Lista de partidos</div><div id="matches-body"></div></div>
+    </div>
+    <div id="tab-pronosticos" class="tab-pane">
+        <div class="card">
+            <div class="card-title">Pronósticos por participante</div>
+            <div class="form-row" style="margin-bottom:20px">
+                <div class="field" style="max-width:280px"><label>Participante</label>
+                    <select id="sel-participant" onchange="renderPronosticos()">
+                        <option value="">— Seleccionar —</option>
+                    </select>
+                </div>
+            </div>
+            <div id="pronosticos-body"></div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ ESTADÍSTICAS ═══════════════ -->
+    <div id="tab-stats" class="tab-pane">
+        <div id="stats-cards" style="margin-bottom:20px"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px;margin-bottom:20px">
+            <div class="card">
+                <div class="card-title">Puntos por participante</div>
+                <div style="position:relative;height:280px">
+                    <canvas id="chart-pts"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Precisión de pronósticos (%)</div>
+                <div style="position:relative;height:280px">
+                    <canvas id="chart-acc"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">Desglose por participante — Aciertos · Errores · Sin pronóstico</div>
+            <div style="position:relative;height:320px">
+                <canvas id="chart-breakdown"></canvas>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">Resultados del torneo hasta ahora</div>
+            <div style="position:relative;height:220px">
+                <canvas id="chart-results"></canvas>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Modal resultado -->
+<div class="modal-overlay" id="result-modal">
+    <div class="modal-box">
+        <div class="modal-title">Ingresar resultado</div>
+        <div class="match-info">
+            <div class="match-teams" id="modal-teams">—</div>
+            <div class="match-meta"  id="modal-meta">—</div>
+        </div>
+        <div class="result-opts">
+            <div class="r-btn" id="rb-team1" onclick="selectR('team1')">
+                <div class="r-btn-team" id="rb-t1-label">Equipo 1</div>
+                <div class="r-btn-sub">Gana equipo 1</div>
+            </div>
+            <div class="r-btn" id="rb-draw" onclick="selectR('draw')">
+                <div class="r-btn-team">Empate</div>
+                <div class="r-btn-sub">Sin ganador</div>
+            </div>
+            <div class="r-btn" id="rb-team2" onclick="selectR('team2')">
+                <div class="r-btn-team" id="rb-t2-label">Equipo 2</div>
+                <div class="r-btn-sub">Gana equipo 2</div>
+            </div>
+        </div>
+        <div style="font-size:.78rem;color:var(--muted);margin-bottom:16px">Resultado a 90 minutos (no incluye alargue/penales).</div>
+        <div class="modal-actions">
+            <button class="btn btn-sm btn-outline-red" onclick="clearResult()">Borrar resultado</button>
+            <div class="spacer"></div>
+            <button class="btn btn-outline btn-sm" onclick="closeModal()">Cancelar</button>
+            <button class="btn btn-green btn-sm" onclick="confirmResult()">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal editar equipos -->
+<div class="modal-overlay" id="edit-modal">
+    <div class="modal-box">
+        <div class="modal-title">Editar nombres de equipos</div>
+        <div class="edit-teams-form">
+            <div class="field"><label>Equipo 1</label><input type="text" id="edit-t1" maxlength="40"></div>
+            <div class="field"><label>Equipo 2</label><input type="text" id="edit-t2" maxlength="40"></div>
+        </div>
+        <div class="modal-actions">
+            <div class="spacer"></div>
+            <button class="btn btn-outline btn-sm" onclick="closeEditModal()">Cancelar</button>
+            <button class="btn btn-gold btn-sm" onclick="confirmEditTeams()">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+<script>
+// ── STATE ──────────────────────────────────────────────────
+const STORE_KEY = 'prode_mundial_2026';
+
+function loadState() {
+    try { const s=localStorage.getItem(STORE_KEY); return s?JSON.parse(s):{participants:[],matches:[],predictions:[]}; }
+    catch { return {participants:[],matches:[],predictions:[]}; }
+}
+function persist() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+
+// ── DATOS INICIALES (del Excel) ────────────────────────────
+const INITIAL_DATA = (function(){
+    const parts = [
+        {id:'p1',name:'ISMA'},{id:'p2',name:'SEBAS'},{id:'p3',name:'JORGE'},
+        {id:'p4',name:'JHONIERA'},{id:'p5',name:'JHONY'},{id:'p6',name:'JHAN CARLOS'},
+        {id:'p7',name:'BRAYAN'},{id:'p8',name:'JHONATHAN'},{id:'p9',name:'ESTEFANY'},
+        {id:'p10',name:'CHUCHA'},{id:'p11',name:'PAULINA'}
+    ];
+    const G = 'Fase de Grupos';
+    const matches = [
+        // ── Grupo A: Mexico · S.Africa · Corea del Sur · Chequia ──
+        {id:'m1', phase:G,date:'2026-06-11',team1:'Mexico',      team2:'S. Africa',      result:'team1'}, // 2-0
+        {id:'m2', phase:G,date:'2026-06-12',team1:'Chequia',     team2:'Corea del Sur',  result:'team2'}, // 1-2
+        // ── Grupo B: Canada · Bosnia · Qatar · Suiza ──
+        {id:'m3', phase:G,date:'2026-06-12',team1:'Canada',      team2:'Bosnia',         result:'draw'},  // 1-1
+        {id:'m5', phase:G,date:'2026-06-13',team1:'Suiza',       team2:'Qatar',          result:'draw'},  // 1-1
+        // ── Grupo C: Brasil · Marruecos · Haiti · Escocia ──
+        {id:'m6', phase:G,date:'2026-06-13',team1:'Brasil',      team2:'Marruecos',      result:'draw'},  // 1-1
+        {id:'m7', phase:G,date:'2026-06-13',team1:'Escocia',     team2:'Haiti',          result:'team1'}, // 1-0
+        // ── Grupo D: USA · Paraguay · Australia · Turquia ──
+        {id:'m4', phase:G,date:'2026-06-12',team1:'Paraguay',    team2:'USA',            result:'team2'}, // 1-4
+        {id:'m8', phase:G,date:'2026-06-13',team1:'Turquia',     team2:'Australia',      result:'team2'}, // 0-2
+        // ── Grupo E: Alemania · Curazao · Costa de Marfil · Ecuador ──
+        {id:'m9', phase:G,date:'2026-06-14',team1:'Alemania',    team2:'Curazao',        result:'team1'}, // 7-1
+        {id:'m11',phase:G,date:'2026-06-14',team1:'Ecuador',     team2:'Costa de Marfil',result:'team2'}, // 0-1
+        // ── Grupo F: Holanda · Japon · Suecia · Tunez ──
+        {id:'m10',phase:G,date:'2026-06-14',team1:'Holanda',     team2:'Japon',          result:'draw'},  // 2-2
+        {id:'m12',phase:G,date:'2026-06-15',team1:'Suecia',      team2:'Tunez',          result:'team1'}, // 5-1
+        // ── Grupo G: Belgica · Egipto · Iran · Nueva Zelanda ──
+        {id:'m14',phase:G,date:'2026-06-15',team1:'Belgica',     team2:'Egipto',         result:'draw'},  // 1-1
+        {id:'m16',phase:G,date:'2026-06-15',team1:'Iran',        team2:'Nueva Zelanda',  result:'draw'},  // 2-2
+        // ── Grupo H: España · Cabo Verde · Arabia Saudita · Uruguay ──
+        {id:'m13',phase:G,date:'2026-06-15',team1:'España',      team2:'Cabo Verde',     result:'draw'},  // 0-0
+        {id:'m15',phase:G,date:'2026-06-15',team1:'Uruguay',     team2:'Arabia Saudita', result:'draw'},  // 1-1
+        // ── Grupo I: Francia · Senegal · Iraq · Noruega ──
+        {id:'m17',phase:G,date:'2026-06-16',team1:'Francia',     team2:'Senegal',        result:'team1'}, // 3-1
+        {id:'m18',phase:G,date:'2026-06-16',team1:'Iraq',        team2:'Noruega',        result:'team2'}, // 1-4
+        // ── Grupo J: Argentina · Argelia · Austria · Jordania ──
+        {id:'m19',phase:G,date:'2026-06-16',team1:'Argentina',   team2:'Argelia',        result:'team1'}, // 3-0
+        {id:'m20',phase:G,date:'2026-06-16',team1:'Austria',     team2:'Jordania',       result:'team1'}, // 3-1
+        // ── Grupo K: Portugal · Congo · Uzbekistan · Colombia ──
+        {id:'m21',phase:G,date:'2026-06-17',team1:'Portugal',    team2:'Congo DR',       result:'draw'},  // 1-1
+        {id:'m22',phase:G,date:'2026-06-17',team1:'Colombia',    team2:'Uzbekistan',     result:'team1'}, // 3-1
+        // ── Grupo L: Inglaterra · Croacia · Ghana · Panama ──
+        {id:'m23',phase:G,date:'2026-06-17',team1:'Inglaterra',  team2:'Croacia',        result:'team1'}, // 4-2
+        {id:'m24',phase:G,date:'2026-06-17',team1:'Ghana',       team2:'Panama',         result:'team1'}, // 1-0
+        // ── Jornada 2 — Grupos A y B (18 Jun) ──
+        {id:'m25',phase:G,date:'2026-06-18',team1:'Chequia',     team2:'S. Africa',      result:null},
+        {id:'m26',phase:G,date:'2026-06-18',team1:'Suiza',       team2:'Bosnia',         result:null},
+        {id:'m27',phase:G,date:'2026-06-18',team1:'Canada',      team2:'Qatar',          result:null},
+        {id:'m28',phase:G,date:'2026-06-18',team1:'Mexico',      team2:'Corea del Sur',  result:null}
+    ];
+    const preds = [];
+    function p(pid,mid,pred){ preds.push({participantId:pid,matchId:mid,prediction:pred}); }
+    // M1 Mexico vs ???
+    p('p1','m1','team1');p('p2','m1','draw'); p('p3','m1','team1');p('p4','m1','team1');
+    p('p5','m1','team1');p('p6','m1','team1');p('p7','m1','team1');p('p8','m1','team1');
+    p('p9','m1','team1');p('p10','m1','team1');p('p11','m1','team1');
+    // M2 Chequia vs Corea
+    p('p1','m2','team1');p('p2','m2','team2');p('p3','m2','team1');p('p4','m2','draw');
+    p('p5','m2','draw'); p('p6','m2','team2');p('p7','m2','draw'); p('p8','m2','draw');
+    p('p9','m2','team2');p('p10','m2','team2');p('p11','m2','team2');
+    // M3 Canada vs Bosnia
+    p('p1','m3','team1');p('p2','m3','draw'); p('p3','m3','team1');p('p4','m3','team1');
+    p('p5','m3','team1');p('p6','m3','team2');p('p7','m3','draw'); p('p8','m3','team2');
+    p('p9','m3','team1');p('p10','m3','team1');p('p11','m3','draw');
+    // M4 Paraguay vs USA
+    p('p1','m4','team1');p('p2','m4','team2');p('p3','m4','draw'); p('p4','m4','team2');
+    p('p5','m4','team2');p('p6','m4','team2');p('p7','m4','team2');p('p8','m4','draw');
+    p('p9','m4','team2');p('p10','m4','team2');p('p11','m4','team2');
+    // M5 Suiza vs Qatar
+    p('p1','m5','team1');p('p2','m5','team1');p('p3','m5','team2');p('p4','m5','team1');
+    p('p5','m5','team1');p('p6','m5','team1');p('p7','m5','team1');p('p8','m5','team1');
+    p('p9','m5','team1');p('p10','m5','draw');p('p11','m5','team1');
+    // M6 Brasil vs Marruecos
+    p('p1','m6','team1');p('p2','m6','draw'); p('p3','m6','team2');p('p4','m6','team1');
+    p('p5','m6','draw'); p('p6','m6','team1');p('p7','m6','team1');p('p8','m6','team1');
+    p('p9','m6','team1');p('p10','m6','team1');p('p11','m6','team1');
+    // M7 Escocia vs ???
+    p('p1','m7','team1');p('p2','m7','team1');p('p3','m7','team1');p('p4','m7','team1');
+    p('p5','m7','team1');p('p6','m7','team1');p('p7','m7','team1');p('p8','m7','team1');
+    p('p9','m7','team1');p('p10','m7','team1');p('p11','m7','team1');
+    // M8 Turquia vs Australia  (JORGE no estaba legible)
+    p('p1','m8','team1');p('p2','m8','team1');
+    p('p4','m8','team1');p('p5','m8','draw'); p('p6','m8','team1');p('p7','m8','team1');
+    p('p8','m8','team1');p('p9','m8','team2');p('p10','m8','team1');p('p11','m8','team2');
+    // M9 Alemania vs ???
+    p('p1','m9','team1');p('p2','m9','team1');p('p3','m9','team1');p('p4','m9','team1');
+    p('p5','m9','team1');p('p6','m9','team1');p('p7','m9','team1');p('p8','m9','team1');
+    p('p9','m9','team1');p('p10','m9','team1');p('p11','m9','team1');
+    // M10 Holanda vs Japon
+    p('p1','m10','team1');p('p2','m10','team2');p('p3','m10','team2');p('p4','m10','team2');
+    p('p5','m10','draw'); p('p6','m10','draw'); p('p7','m10','team1');p('p8','m10','team1');
+    p('p9','m10','team2');p('p10','m10','team1');p('p11','m10','team2');
+    // M11 Ecuador vs Costa de Marfil  (JHONY no estaba legible)
+    p('p1','m11','team1');p('p2','m11','team1');p('p3','m11','team1');p('p4','m11','draw');
+    p('p6','m11','team2');p('p7','m11','draw'); p('p8','m11','team2');
+    p('p9','m11','team1');p('p10','m11','team2');p('p11','m11','team2');
+    // M12 Suecia vs Tunez
+    p('p1','m12','draw');p('p10','m12','team2');
+    // M13 España vs ???
+    p('p1','m13','team1');p('p2','m13','team1');p('p3','m13','team1');p('p4','m13','team1');
+    p('p5','m13','team1');p('p6','m13','team1');p('p7','m13','team1');p('p8','m13','team1');
+    p('p9','m13','team1');p('p10','m13','team1');p('p11','m13','team1');
+    // M14 Belgica vs ???
+    p('p1','m14','team1');p('p2','m14','team1');p('p3','m14','team1');p('p4','m14','team1');
+    p('p5','m14','team1');p('p6','m14','team1');p('p7','m14','team1');p('p8','m14','team1');
+    p('p9','m14','team1');p('p10','m14','team1');p('p11','m14','team1');
+    // M15 Uruguay vs ???
+    p('p1','m15','team1');p('p2','m15','team1');p('p3','m15','team1');p('p4','m15','team1');
+    p('p5','m15','team1');p('p6','m15','team1');p('p7','m15','team1');p('p8','m15','team1');
+    p('p9','m15','team1');p('p10','m15','team1');p('p11','m15','team1');
+    // M16 Iran vs Nueva Zelanda
+    p('p1','m16','team1');p('p2','m16','team1');p('p3','m16','team1');p('p4','m16','team1');
+    p('p5','m16','draw'); p('p6','m16','team1');p('p7','m16','team1');p('p8','m16','team1');
+    p('p9','m16','team1');p('p10','m16','team1');p('p11','m16','team2');
+    // M25 Chequia vs S.Africa
+    p('p1','m25','team1');p('p2','m25','draw'); p('p3','m25','team2');p('p4','m25','team1');
+    p('p5','m25','team1');p('p6','m25','team1');p('p7','m25','team1');p('p8','m25','team1');
+    p('p9','m25','team1');p('p10','m25','team1');p('p11','m25','team1');
+    // M26 Suiza vs Bosnia
+    p('p1','m26','team1');p('p2','m26','team2');p('p3','m26','team1');p('p4','m26','team1');
+    p('p5','m26','team1');p('p6','m26','team1');p('p7','m26','team1');p('p8','m26','draw');
+    p('p9','m26','team1');p('p10','m26','team1');p('p11','m26','team1');
+    // M27 Canada vs Qatar
+    p('p2','m27','team2');p('p3','m27','draw'); p('p4','m27','draw'); p('p5','m27','draw');
+    p('p6','m27','team1');p('p7','m27','team1');p('p8','m27','team1');p('p9','m27','team1');
+    p('p10','m27','team2');p('p11','m27','team2');
+    // M28 Mexico vs Corea del Sur
+    p('p1','m28','draw'); p('p2','m28','team1');p('p3','m28','draw'); p('p4','m28','team2');
+    p('p5','m28','draw'); p('p6','m28','team2');p('p7','m28','team1');p('p8','m28','draw');
+    p('p9','m28','team1');p('p10','m28','team1');p('p11','m28','team2');
+    return {participants:parts, matches, predictions:preds};
+})();
+
+function mergeInitialData(s) {
+    let updated = false;
+    // Participantes: agregar faltantes
+    INITIAL_DATA.participants.forEach(ip => {
+        if (!s.participants.find(p => p.id === ip.id)) { s.participants.push(ip); updated = true; }
+    });
+    // Partidos: agregar faltantes, actualizar nombres de equipos y resultados autoritativos
+    INITIAL_DATA.matches.forEach(im => {
+        const ex = s.matches.find(m => m.id === im.id);
+        if (!ex) { s.matches.push({...im}); updated = true; }
+        else {
+            if (im.team1 !== '???' && ex.team1 !== im.team1) { ex.team1 = im.team1; updated = true; }
+            if (im.team2 !== '???' && ex.team2 !== im.team2) { ex.team2 = im.team2; updated = true; }
+            if (im.date  && ex.date  !== im.date)  { ex.date  = im.date;  updated = true; }
+            // Sobreescribir resultado si INITIAL_DATA tiene uno (son resultados oficiales)
+            if (im.result !== null && ex.result !== im.result) { ex.result = im.result; updated = true; }
+        }
+    });
+    // Pronósticos: agregar faltantes
+    INITIAL_DATA.predictions.forEach(ip => {
+        if (!s.predictions.find(p => p.participantId === ip.participantId && p.matchId === ip.matchId)) {
+            s.predictions.push({...ip}); updated = true;
+        }
+    });
+    if (updated) localStorage.setItem(STORE_KEY, JSON.stringify(s));
+    return s;
+}
+
+let state = (function(){
+    const s = loadState();
+    return mergeInitialData(s);
+})();
+
+let _modalMatchId=null, _modalResult=null, _editMatchId=null;
+
+// ── HELPERS ────────────────────────────────────────────────
+function uid(){ return Math.random().toString(36).slice(2)+Date.now().toString(36); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDate(d){ if(!d)return'—'; const[y,m,day]=d.split('-'); return`${day}/${m}/${y}`; }
+const PHASE_ORDER=['Fase de Grupos','Ronda de 32','Octavos de Final','Cuartos de Final','Semifinal','Tercer Lugar','Final'];
+function phaseIdx(p){ const i=PHASE_ORDER.indexOf(p); return i===-1?99:i; }
+function sortedMatches(){ return [...state.matches].sort((a,b)=>{ const d=phaseIdx(a.phase)-phaseIdx(b.phase); return d||((a.date||'')<=(b.date||'')?-1:1); }); }
+
+// ── DATA OPS ───────────────────────────────────────────────
+function addParticipant(name){ state.participants.push({id:uid(),name}); persist(); renderAll(); }
+function removeParticipant(id){
+    if(!confirm('¿Eliminar este participante y todos sus pronósticos?'))return;
+    state.participants=state.participants.filter(p=>p.id!==id);
+    state.predictions=state.predictions.filter(p=>p.participantId!==id);
+    persist(); renderAll();
+}
+function addMatch(data){ state.matches.push({id:uid(),...data,result:null}); persist(); renderAll(); }
+function removeMatch(id){
+    if(!confirm('¿Eliminar este partido y los pronósticos relacionados?'))return;
+    state.matches=state.matches.filter(m=>m.id!==id);
+    state.predictions=state.predictions.filter(p=>p.matchId!==id);
+    persist(); renderAll();
+}
+function getPred(pid,mid){ const p=state.predictions.find(p=>p.participantId===pid&&p.matchId===mid); return p?p.prediction:''; }
+function setPred(pid,mid,pred){
+    const idx=state.predictions.findIndex(p=>p.participantId===pid&&p.matchId===mid);
+    if(!pred){ if(idx!==-1)state.predictions.splice(idx,1); }
+    else if(idx!==-1){ state.predictions[idx].prediction=pred; }
+    else{ state.predictions.push({participantId:pid,matchId:mid,prediction:pred}); }
+    persist(); renderLeaderboard();
+}
+function getPoints(pid){ return state.matches.reduce((s,m)=>{ if(!m.result)return s; return s+(getPred(pid,m.id)===m.result?1:0); },0); }
+
+// ── RESULT MODAL ───────────────────────────────────────────
+function openResultModal(mid){
+    const m=state.matches.find(x=>x.id===mid); if(!m)return;
+    _modalMatchId=mid; _modalResult=m.result;
+    document.getElementById('modal-teams').textContent=`${m.team1}  vs  ${m.team2}`;
+    document.getElementById('modal-meta').textContent=`${m.phase}${m.date?'  ·  '+fmtDate(m.date):''}`;
+    document.getElementById('rb-t1-label').textContent=m.team1;
+    document.getElementById('rb-t2-label').textContent=m.team2;
+    ['team1','draw','team2'].forEach(r=>document.getElementById('rb-'+r).classList.toggle('selected',r===_modalResult));
+    document.getElementById('result-modal').classList.add('open');
+}
+function closeModal(){ document.getElementById('result-modal').classList.remove('open'); _modalMatchId=_modalResult=null; }
+function selectR(r){ _modalResult=r; ['team1','draw','team2'].forEach(x=>document.getElementById('rb-'+x).classList.toggle('selected',x===r)); }
+function confirmResult(){
+    if(!_modalMatchId||!_modalResult){alert('Seleccioná un resultado');return;}
+    const m=state.matches.find(x=>x.id===_modalMatchId);
+    if(m){m.result=_modalResult;persist();renderAll();}
+    closeModal();
+}
+function clearResult(){
+    if(!_modalMatchId)return;
+    const m=state.matches.find(x=>x.id===_modalMatchId);
+    if(m){m.result=null;persist();renderAll();}
+    closeModal();
+}
+
+// ── EDIT TEAMS MODAL ───────────────────────────────────────
+function openEditModal(mid){
+    const m=state.matches.find(x=>x.id===mid); if(!m)return;
+    _editMatchId=mid;
+    document.getElementById('edit-t1').value=m.team1;
+    document.getElementById('edit-t2').value=m.team2;
+    document.getElementById('edit-modal').classList.add('open');
+}
+function closeEditModal(){ document.getElementById('edit-modal').classList.remove('open'); _editMatchId=null; }
+function confirmEditTeams(){
+    const t1=document.getElementById('edit-t1').value.trim();
+    const t2=document.getElementById('edit-t2').value.trim();
+    if(!t1||!t2){alert('Ingresá ambos equipos');return;}
+    const m=state.matches.find(x=>x.id===_editMatchId);
+    if(m){m.team1=t1;m.team2=t2;persist();renderAll();}
+    closeEditModal();
+}
+
+// ── RENDER: LEADERBOARD ────────────────────────────────────
+function renderLeaderboard(){
+    const done=state.matches.filter(m=>m.result).length;
+    document.getElementById('stats-summary').innerHTML=`
+    <div class="stat-grid">
+        <div class="stat-box"><div class="stat-value">${state.participants.length}</div><div class="stat-label">Participantes</div></div>
+        <div class="stat-box"><div class="stat-value">${state.matches.length}</div><div class="stat-label">Partidos cargados</div></div>
+        <div class="stat-box"><div class="stat-value">${done}</div><div class="stat-label">Con resultado</div></div>
+        <div class="stat-box"><div class="stat-value">${state.matches.length-done}</div><div class="stat-label">Pendientes</div></div>
+    </div>`;
+    const el=document.getElementById('leaderboard-body');
+    if(!state.participants.length){el.innerHTML='<div class="empty"><div class="empty-icon">👥</div>Agregá participantes en la pestaña <strong>Participantes</strong>.</div>';return;}
+    const ranked=state.participants.map(p=>({...p,pts:getPoints(p.id),preds:state.predictions.filter(pr=>pr.participantId===p.id).length})).sort((a,b)=>b.pts-a.pts||a.name.localeCompare(b.name));
+    let html='<div class="table-wrap"><table><thead><tr><th>#</th><th>Participante</th><th>Puntos</th><th>Pronósticos</th><th>Aciertos</th></tr></thead><tbody>';
+    ranked.forEach((p,i)=>{
+        const rk=i+1,rc=rk<=3?`rank-${rk}`:'rank-n',pct=done>0?Math.round(p.pts/done*100):0;
+        html+=`<tr><td><span class="rank-c ${rc}">${rk}</span></td><td><strong>${esc(p.name)}</strong></td><td><span class="pts">${p.pts}</span></td>
+        <td style="color:var(--muted);font-size:.85rem">${p.preds} / ${state.matches.length}</td>
+        <td style="min-width:130px">${done>0?`<div style="font-size:.78rem;color:var(--muted)">${p.pts} de ${done} (${pct}%)</div><div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>`:'<span style="color:var(--muted);font-size:.8rem">Sin resultados aún</span>'}</td></tr>`;
+    });
+    el.innerHTML=html+'</tbody></table></div>';
+}
+
+// ── RENDER: PARTICIPANTES ──────────────────────────────────
+function renderParticipants(){
+    const el=document.getElementById('participants-body');
+    if(!state.participants.length){el.innerHTML='<div class="empty"><div class="empty-icon">👤</div>No hay participantes.</div>';return;}
+    let html='<table><thead><tr><th>#</th><th>Nombre</th><th>Puntos actuales</th><th></th></tr></thead><tbody>';
+    state.participants.forEach((p,i)=>{html+=`<tr><td style="color:var(--muted)">${i+1}</td><td>${esc(p.name)}</td><td><span class="pts">${getPoints(p.id)}</span></td><td style="text-align:right"><button class="btn btn-sm btn-outline-red" onclick="removeParticipant('${p.id}')">Eliminar</button></td></tr>`;});
+    el.innerHTML=html+'</tbody></table>';
+}
+
+// ── RENDER: PARTIDOS ───────────────────────────────────────
+function renderMatches(){
+    const el=document.getElementById('matches-body'),sorted=sortedMatches();
+    if(!sorted.length){el.innerHTML='<div class="empty"><div class="empty-icon">📋</div>No hay partidos cargados.</div>';return;}
+    let html='<div class="table-wrap"><table><thead><tr><th>Fase</th><th>Fecha</th><th>Partido</th><th>Resultado</th><th></th></tr></thead><tbody>';
+    sorted.forEach(m=>{
+        const hasUnknown=m.team1==='???'||m.team2==='???';
+        const rLabel=m.result?(m.result==='team1'?`✓ ${esc(m.team1)}`:m.result==='team2'?`✓ ${esc(m.team2)}`:'✓ Empate'):'Pendiente';
+        const bClass=m.result?'badge-done':'badge-pending';
+        const warnBadge=hasUnknown?'<span class="badge badge-warn" style="margin-left:6px">⚠ equipo falta</span>':'';
+        html+=`<tr>
+            <td><span class="badge badge-phase">${esc(m.phase)}</span></td>
+            <td style="color:var(--muted);font-size:.85rem">${fmtDate(m.date)}</td>
+            <td><strong>${esc(m.team1)}</strong> <span style="color:var(--muted)">vs</span> <strong>${esc(m.team2)}</strong>${warnBadge}</td>
+            <td><span class="badge ${bClass}">${rLabel}</span></td>
+            <td style="text-align:right;white-space:nowrap">
+                <button class="btn btn-sm btn-outline-gold" style="margin-right:6px" onclick="openEditModal('${m.id}')">Editar equipos</button>
+                <button class="btn btn-sm btn-outline" style="margin-right:6px" onclick="openResultModal('${m.id}')">${m.result?'Editar resultado':'Ingresar resultado'}</button>
+                <button class="btn btn-sm btn-outline-red" onclick="removeMatch('${m.id}')">✕</button>
+            </td>
+        </tr>`;
+    });
+    el.innerHTML=html+'</tbody></table></div>';
+}
+
+// ── RENDER: PRONÓSTICOS ────────────────────────────────────
+function updateParticipantSelect(){
+    const sel=document.getElementById('sel-participant'),cur=sel.value;
+    sel.innerHTML='<option value="">— Seleccionar —</option>';
+    state.participants.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.name;if(p.id===cur)o.selected=true;sel.appendChild(o);});
+}
+function renderPronosticos(){
+    const pid=document.getElementById('sel-participant').value,el=document.getElementById('pronosticos-body');
+    if(!pid){el.innerHTML='<div class="empty"><div class="empty-icon">🎯</div>Seleccioná un participante para ver y editar sus pronósticos.</div>';return;}
+    const sorted=sortedMatches();
+    if(!sorted.length){el.innerHTML='<div class="empty"><div class="empty-icon">📋</div>No hay partidos cargados.</div>';return;}
+    const pts=getPoints(pid),done=state.matches.filter(m=>m.result).length,predCount=state.predictions.filter(p=>p.participantId===pid).length;
+    let html=`<div class="p-summary">
+        <div class="p-summary-item"><span>Puntos</span><strong style="color:var(--green)">${pts}</strong></div>
+        <div class="p-summary-item"><span>Pronósticos</span><strong>${predCount} / ${state.matches.length}</strong></div>
+        <div class="p-summary-item"><span>Aciertos</span><strong>${pts} / ${done}</strong></div>
+    </div>`;
+    const byPhase={};
+    sorted.forEach(m=>{(byPhase[m.phase]=byPhase[m.phase]||[]).push(m);});
+    Object.keys(byPhase).sort((a,b)=>phaseIdx(a)-phaseIdx(b)).forEach(phase=>{
+        html+=`<div class="section-sep">${esc(phase)}</div><div class="table-wrap" style="margin-bottom:14px"><table><thead><tr><th>Fecha</th><th>Partido</th><th>Mi pronóstico</th><th>Resultado</th><th>Estado</th></tr></thead><tbody>`;
+        byPhase[phase].forEach(m=>{
+            const pred=getPred(pid,m.id);
+            let rowClass='',status='<span style="color:var(--muted);font-size:.8rem">—</span>';
+            if(m.result&&pred){
+                if(pred===m.result){rowClass='row-correct';status='<span style="color:var(--green);font-weight:700">✓ Acierto</span>';}
+                else{rowClass='row-wrong';status='<span style="color:var(--red)">✗ Error</span>';}
+            } else if(!pred){ status='<span style="color:var(--muted);font-size:.8rem">Sin pronóstico</span>'; }
+            else{ status='<span style="color:var(--muted);font-size:.8rem">Esperando resultado</span>'; }
+            const rTxt=m.result?(m.result==='team1'?esc(m.team1):m.result==='team2'?esc(m.team2):'Empate'):'<span style="color:var(--muted)">—</span>';
+            html+=`<tr class="${rowClass}">
+                <td style="color:var(--muted);font-size:.82rem">${fmtDate(m.date)}</td>
+                <td>${esc(m.team1)} <span style="color:var(--muted)">vs</span> ${esc(m.team2)}</td>
+                <td><select class="pred-sel" onchange="setPred('${pid}','${m.id}',this.value);renderPronosticos()">
+                    <option value=""  ${!pred?'selected':''}>Sin pronóstico</option>
+                    <option value="team1" ${pred==='team1'?'selected':''}>${esc(m.team1)}</option>
+                    <option value="draw"  ${pred==='draw' ?'selected':''}>Empate</option>
+                    <option value="team2" ${pred==='team2'?'selected':''}>${esc(m.team2)}</option>
+                </select></td>
+                <td style="font-size:.85rem">${rTxt}</td>
+                <td>${status}</td>
+            </tr>`;
+        });
+        html+='</tbody></table></div>';
+    });
+    el.innerHTML=html;
+}
+
+// ── HANDLERS ───────────────────────────────────────────────
+function handleAddParticipant(){
+    const inp=document.getElementById('inp-p-name'),name=inp.value.trim();
+    if(!name){alert('Ingresá un nombre');return;}
+    if(state.participants.some(p=>p.name.toLowerCase()===name.toLowerCase())){alert('Ya existe ese participante');return;}
+    addParticipant(name); inp.value=''; inp.focus();
+}
+function handleAddMatch(){
+    const phase=document.getElementById('inp-m-phase').value,date=document.getElementById('inp-m-date').value,
+          t1=document.getElementById('inp-m-t1').value.trim(),t2=document.getElementById('inp-m-t2').value.trim();
+    if(!t1||!t2){alert('Ingresá los dos equipos');return;}
+    if(t1.toLowerCase()===t2.toLowerCase()){alert('Los equipos deben ser distintos');return;}
+    addMatch({phase,date,team1:t1,team2:t2});
+    document.getElementById('inp-m-t1').value=''; document.getElementById('inp-m-t2').value='';
+    document.getElementById('inp-m-t1').focus();
+}
+
+// ── TABS ───────────────────────────────────────────────────
+document.getElementById('tabNav').addEventListener('click',e=>{
+    const btn=e.target.closest('.tab-btn'); if(!btn)return;
+    const tab=btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active'); document.getElementById('tab-'+tab).classList.add('active');
+    if(tab==='pronosticos')renderPronosticos();
+    if(tab==='stats')renderStats();
+});
+document.getElementById('inp-p-name').addEventListener('keydown',e=>{if(e.key==='Enter')handleAddParticipant();});
+document.getElementById('inp-m-t2').addEventListener('keydown',e=>{if(e.key==='Enter')handleAddMatch();});
+document.getElementById('result-modal').addEventListener('click',e=>{if(e.target===document.getElementById('result-modal'))closeModal();});
+document.getElementById('edit-modal').addEventListener('click',e=>{if(e.target===document.getElementById('edit-modal'))closeEditModal();});
+
+// ── RENDER ALL ─────────────────────────────────────────────
+function renderAll(){
+    renderLeaderboard(); renderParticipants(); renderMatches(); updateParticipantSelect();
+    if(document.getElementById('tab-pronosticos').classList.contains('active'))renderPronosticos();
+    if(document.getElementById('tab-stats').classList.contains('active'))renderStats();
+}
+renderAll();
+
+// ── ESTADÍSTICAS ────────────────────────────────────────────
+let _charts = {};
+
+function renderStats(){
+    if(!state.participants.length){
+        ['stats-cards','chart-pts','chart-acc','chart-breakdown','chart-results'].forEach(id=>{
+            const el=document.getElementById(id); if(el&&el.tagName!=='CANVAS') el.innerHTML='<div class="empty"><div class="empty-icon">📊</div>Agregá participantes para ver estadísticas.</div>';
+        });
+        return;
+    }
+
+    const completedM = state.matches.filter(m=>m.result);
+    const totalDone  = completedM.length;
+    const totalM     = state.matches.length;
+
+    // ── Datos por participante ──────────────────────────────
+    const data = state.participants.map(p=>{
+        let correct=0, wrong=0, noPred=0;
+        completedM.forEach(m=>{
+            const pred = getPred(p.id, m.id);
+            if(!pred)             noPred++;
+            else if(pred===m.result) correct++;
+            else                  wrong++;
+        });
+        const acc = totalDone>0 ? Math.round(correct/totalDone*100) : 0;
+        return { name:p.name, pts:getPoints(p.id), correct, wrong, noPred, acc };
+    }).sort((a,b)=>b.pts-a.pts);
+
+    // ── Cards resumen ───────────────────────────────────────
+    const leader   = data[0];
+    const avgAcc   = data.length ? Math.round(data.reduce((s,d)=>s+d.acc,0)/data.length) : 0;
+    const maxAcc   = data.reduce((mx,d)=>d.acc>mx.acc?d:mx, data[0]);
+    const draws    = completedM.filter(m=>m.result==='draw').length;
+    document.getElementById('stats-cards').innerHTML=`
+        <div class="stat-grid">
+            <div class="stat-box"><div class="stat-value" style="color:var(--gold)">${leader?.name||'—'}</div><div class="stat-label">Líder actual</div></div>
+            <div class="stat-box"><div class="stat-value">${leader?.pts||0}</div><div class="stat-label">Puntos del líder</div></div>
+            <div class="stat-box"><div class="stat-value">${maxAcc?.name||'—'}</div><div class="stat-label">Mayor precisión</div></div>
+            <div class="stat-box"><div class="stat-value">${maxAcc?.acc||0}%</div><div class="stat-label">Precisión máxima</div></div>
+            <div class="stat-box"><div class="stat-value">${avgAcc}%</div><div class="stat-label">Precisión promedio</div></div>
+            <div class="stat-box"><div class="stat-value">${draws}/${totalDone}</div><div class="stat-label">Empates del torneo</div></div>
+        </div>`;
+
+    const labels    = data.map(d=>d.name);
+    const pts       = data.map(d=>d.pts);
+    const corrects  = data.map(d=>d.correct);
+    const wrongs    = data.map(d=>d.wrong);
+    const noPreds   = data.map(d=>d.noPred);
+    const accs      = data.map(d=>d.acc);
+
+    const COLORS    = data.map((_,i)=>i===0?'#c9a227':i===1?'#8a8a8a':i===2?'#c47c2e':'#2ea84e');
+    const gridColor = 'rgba(30,58,95,0.6)';
+    const axisColor = '#8899aa';
+    const labelColor= '#e8edf5';
+
+    const baseOpts = {
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ labels:{ color:labelColor, padding:14, boxWidth:14 } } },
+        scales:{
+            y:{ beginAtZero:true, ticks:{color:axisColor, stepSize:1}, grid:{color:gridColor} },
+            x:{ ticks:{color:labelColor, maxRotation:30}, grid:{display:false} }
+        }
+    };
+
+    function mkChart(id, cfg){
+        if(_charts[id]) _charts[id].destroy();
+        _charts[id] = new Chart(document.getElementById(id).getContext('2d'), cfg);
+    }
+
+    // Gráfica 1 — Puntos
+    mkChart('chart-pts',{
+        type:'bar',
+        data:{ labels, datasets:[{
+            label:'Puntos', data:pts,
+            backgroundColor:COLORS,
+            borderRadius:6, borderSkipped:false
+        }]},
+        options:{...baseOpts, plugins:{...baseOpts.plugins, legend:{display:false},
+            tooltip:{callbacks:{label:c=>' '+c.raw+' puntos'}}}}
+    });
+
+    // Gráfica 2 — Precisión
+    mkChart('chart-acc',{
+        type:'bar',
+        data:{ labels, datasets:[{
+            label:'Precisión (%)', data:accs,
+            backgroundColor:accs.map(a=>a>=60?'rgba(46,168,78,0.8)':a>=40?'rgba(201,162,39,0.8)':'rgba(224,85,85,0.7)'),
+            borderRadius:6, borderSkipped:false
+        }]},
+        options:{
+            ...baseOpts,
+            plugins:{...baseOpts.plugins, legend:{display:false},
+                tooltip:{callbacks:{label:c=>' '+c.raw+'%'}}},
+            scales:{...baseOpts.scales, y:{...baseOpts.scales.y, max:100, ticks:{color:axisColor, callback:v=>v+'%'}}}
+        }
+    });
+
+    // Gráfica 3 — Desglose apilado
+    mkChart('chart-breakdown',{
+        type:'bar',
+        data:{ labels, datasets:[
+            { label:'Aciertos', data:corrects, backgroundColor:'rgba(46,168,78,0.85)',  borderRadius:3 },
+            { label:'Errores',  data:wrongs,   backgroundColor:'rgba(224,85,85,0.75)',  borderRadius:3 },
+            { label:'Sin pronóstico', data:noPreds, backgroundColor:'rgba(136,153,170,0.3)', borderRadius:3 }
+        ]},
+        options:{
+            ...baseOpts,
+            scales:{
+                y:{stacked:true, beginAtZero:true, ticks:{color:axisColor,stepSize:1}, grid:{color:gridColor}},
+                x:{stacked:true, ticks:{color:labelColor,maxRotation:30}, grid:{display:false}}
+            }
+        }
+    });
+
+    // Gráfica 4 — Tipos de resultado del torneo (dona)
+    const t1wins = completedM.filter(m=>m.result==='team1').length;
+    const t2wins = completedM.filter(m=>m.result==='team2').length;
+    mkChart('chart-results',{
+        type:'doughnut',
+        data:{
+            labels:['Gana Equipo 1','Gana Equipo 2','Empate'],
+            datasets:[{ data:[t1wins,t2wins,draws],
+                backgroundColor:['rgba(46,168,78,0.85)','rgba(201,162,39,0.85)','rgba(136,153,170,0.6)'],
+                borderColor:'#0a1628', borderWidth:3, hoverOffset:8 }]
+        },
+        options:{
+            responsive:true, maintainAspectRatio:false,
+            plugins:{
+                legend:{ position:'right', labels:{ color:labelColor, padding:16, boxWidth:14 } },
+                tooltip:{ callbacks:{ label:c=>` ${c.label}: ${c.raw} partidos (${Math.round(c.raw/totalDone*100)}%)` } }
+            }
+        }
+    });
+}
+</script>
+</body>
+</html>
