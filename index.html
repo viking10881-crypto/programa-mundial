@@ -92,6 +92,10 @@ select.pred-sel { padding:5px 8px; font-size:.82rem; min-width:110px; }
 #loading .spin { width:48px; height:48px; border:4px solid var(--border); border-top-color:var(--gold); border-radius:50%; animation:spin .8s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
 #loading p { color:var(--muted); font-size:.9rem; }
+.toast { position:fixed; bottom:24px; right:24px; padding:11px 20px; border-radius:8px; font-size:.875rem; font-weight:600; z-index:9999; opacity:0; transform:translateY(8px); transition:all .25s; pointer-events:none; }
+.toast.show { opacity:1; transform:translateY(0); }
+.toast-ok  { background:var(--green); color:#fff; }
+.toast-err { background:var(--red);   color:#fff; }
     </style>
 </head>
 <body>
@@ -262,7 +266,22 @@ const DBREF = firebase.database().ref('mundial26');
 
 function toArr(v){ if(!v)return[]; if(Array.isArray(v))return v; return Object.values(v); }
 function normState(s){ s.participants=toArr(s.participants); s.matches=toArr(s.matches); s.predictions=toArr(s.predictions); return s; }
-function save(){ DBREF.set(JSON.parse(JSON.stringify(state))); }
+let _toast=null;
+function showToast(msg,type){
+    if(_toast){clearTimeout(_toast._t);_toast.remove();}
+    const el=document.createElement('div');
+    el.className='toast toast-'+(type||'ok');
+    el.textContent=msg;
+    document.body.appendChild(el);
+    requestAnimationFrame(()=>el.classList.add('show'));
+    _toast=el;
+    el._t=setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),300);},2500);
+}
+function save(){
+    DBREF.set(JSON.parse(JSON.stringify(state)))
+        .then(()=>showToast('Guardado ✓','ok'))
+        .catch(e=>showToast('Error: '+e.message,'err'));
+}
 
 // ── DATOS INICIALES (del Excel) ────────────────────────────
 const INITIAL_DATA = (function(){
